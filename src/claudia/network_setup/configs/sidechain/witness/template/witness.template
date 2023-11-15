@@ -1,0 +1,38 @@
+{
+  "LockingChain": {
+    "Endpoint": {
+      "Host": "{{ locking_chain.Endpoint.Host }}",
+      "Port": {{ locking_chain.Endpoint.Port }}
+    },
+    "TxnSubmit": {
+      "ShouldSubmit": true,
+      "SigningKeySeed": "{{ locking_chain.TxnSubmit.SigningKeySeed }}",
+      "SigningKeyType": "{{ locking_chain.TxnSubmit.SigningKeyType }}",
+      "SubmittingAccount": "{{ locking_chain.TxnSubmit.SubmittingAccount }}"
+    },
+    "RewardAccount": "{{ locking_chain.RewardAccount }}"
+  },
+  "IssuingChain": {
+    "Endpoint": {
+      "Host": "{{ issuing_chain.Endpoint.Host }}",
+      "Port": {{ issuing_chain.Endpoint.Port }}
+    },
+    "TxnSubmit": {
+      "ShouldSubmit": true,
+      "SigningKeySeed": "{{ issuing_chain.TxnSubmit.SigningKeySeed }}",
+      "SigningKeyType": "{{ issuing_chain.TxnSubmit.SigningKeyType }}",
+      "SubmittingAccount": "{{ issuing_chain.TxnSubmit.SubmittingAccount }}"
+    },
+    "RewardAccount": "{{ issuing_chain.RewardAccount }}"
+  },
+  "RPCEndpoint": {
+    "Host": "127.0.0.1",
+    "Port": {{ rpc_endpoint.Port }}
+  },
+  "DBDir": "/var/lib/witness/{{ witness_name }}/db",
+  "LogFile": "/var/log/witness/{{ witness_name }}.log",
+  "SigningKeySeed": "{{ signing_key_seed }}",
+  "SigningKeyType": "{{ signing_key_type }}",
+  "XChainBridge": {{ xchain_bridge }}
+}
+

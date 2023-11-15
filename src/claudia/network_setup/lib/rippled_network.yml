@@ -1,0 +1,46 @@
+version: '3.3'
+services:
+  rippled_1:
+    image: rippled_node
+    container_name: rippled_1
+    environment:
+      - RIPPLED_BUILD_DIR=$RIPPLED_BUILD_DIR
+      - RIPPLED_CONFIG_DIR=$RIPPLED_CONFIG_DIR
+      - RIPPLED_BIN_DIR=$RIPPLED_BIN_DIR
+      - DOCKER_NETWORK=$DOCKER_NETWORK
+    networks:
+      - ${DOCKER_NETWORK}
+    ports:
+      - 5001:51234
+      - 6001:6006
+      - 2459:2459
+    volumes:
+      - ${RIPPLED_BUILD_DIR}:${RIPPLED_BIN_DIR}
+      - ${RIPPLED_CONFIG_DIR}/rippled_1:/opt/ripple/etc
+      - $HOME/rippled_log/rippled_1:/var/log/rippled
+      - $HOME/rippled_db/rippled_1:/var/lib/rippled/db
+
+  rippled_2:
+    image: rippled_node
+    container_name: rippled_2
+    environment:
+      - RIPPLED_BUILD_DIR=$RIPPLED_BUILD_DIR
+      - RIPPLED_BIN_DIR=$RIPPLED_BIN_DIR
+      - RIPPLED_CONFIG_DIR=$RIPPLED_CONFIG_DIR
+      - DOCKER_NETWORK=$DOCKER_NETWORK
+    networks:
+      - ${DOCKER_NETWORK}
+    ports:
+      - 5002:51234
+      - 6002:6006
+      - 2469:2459
+    volumes:
+      - ${RIPPLED_BUILD_DIR}:${RIPPLED_BIN_DIR}
+      - ${RIPPLED_CONFIG_DIR}/rippled_2:/opt/ripple/etc
+      - $HOME/rippled_log/rippled_2:/var/log/rippled
+      - $HOME/rippled_db/rippled_2:/var/lib/rippled/db
+
+networks:
+  rippled:
+    external: true
+    name: ${DOCKER_NETWORK}

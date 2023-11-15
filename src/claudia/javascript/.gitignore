@@ -1,0 +1,4 @@
+./features/*.feature
+./cucumber-report.html
+*.DS_Store
+./node_modules/

@@ -1,0 +1,8 @@
+FROM ubuntu:22.04
+
+RUN export DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install libatomic1 net-tools iputils-ping wget curl vim -y
+RUN mkdir -p /opt/ripple/bin
+
+CMD ["/opt/ripple/bin/rippled", "--conf", "/opt/ripple/etc/rippled.cfg"]

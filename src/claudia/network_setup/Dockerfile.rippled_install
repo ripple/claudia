@@ -1,0 +1,25 @@
+FROM ubuntu:22.04
+ARG RIPPLED_BRANCH=master
+
+RUN export DEBIAN_FRONTEND=noninteractive
+RUN apt update -y && \
+    apt install apt-transport-https net-tools ca-certificates gnupg iputils-ping wget curl vim -y
+RUN mkdir -p /opt/ripple/bin
+RUN mkdir /usr/local/share/keyrings/ && \
+    wget -q -O - "https://repos.ripple.com/repos/api/gpg/key/public" | gpg --dearmor > ripple-key.gpg && \
+    mv ripple-key.gpg /usr/local/share/keyrings
+
+RUN if [ "$RIPPLED_BRANCH" = "master" ]; then \
+        RIPPLED_BINARIES_TYPE="stable"; \
+    elif [ "$RIPPLED_BRANCH" = "release" ]; then \
+        RIPPLED_BINARIES_TYPE="unstable"; \
+    elif [ "$RIPPLED_BRANCH" = "develop" ]; then \
+        RIPPLED_BINARIES_TYPE="nightly"; \
+    fi; \
+    echo "deb [signed-by=/usr/local/share/keyrings/ripple-key.gpg] https://repos.ripple.com/repos/rippled-deb jammy ${RIPPLED_BINARIES_TYPE}" | \
+    tee -a /etc/apt/sources.list.d/ripple.list
+
+RUN apt -y update
+RUN apt -y install rippled
+
+CMD ["/opt/ripple/bin/rippled", "--conf", "/opt/ripple/etc/rippled.cfg"]
