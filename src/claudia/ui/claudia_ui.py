@@ -316,15 +316,8 @@ elif sidebar_selection == "Custom XRPL Networks":
                         with st.spinner(
                                 'Deploying Network to Cloud. Please do not navigate away, close the tab or refresh the page '
                                 'until the task has finished.'):
-                            # command = f"python3 aws/aws_helper.py {access_key_id} {secret_access_key_id} {region} {master_node_count} {release_node_count} {develop_node_count}"
-                            # launch_console_and_execute(command)
-                            create_ec2_instance(
-                                access_key_id,
-                                secret_access_key_id,
-                                region,
-                                master_node_count,
-                                release_node_count,
-                                develop_node_count)
+                            command = f"python3 aws/aws_helper.py {access_key_id} {secret_access_key_id} {region} {master_node_count} {release_node_count} {develop_node_count}"
+                            launch_console_and_execute(command)
 elif sidebar_selection == "XRPL Tests":
     with st.container():
         test_menu = option_menu(
