@@ -11,7 +11,7 @@ claudia.egg-info/
 **/./idea/
 **/__pycache__/
 **/node_modules/
-
+venv/
 
 #Python level
 ./src/claudia/python/__pycache__

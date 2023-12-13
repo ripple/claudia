@@ -159,9 +159,10 @@ def create_ec2_instance(aws_access_key_id, aws_secret_access_key, region, master
         print(f"Preparing Instance {str(index + 1)}")
         setup_claudia_and_install_rippled(ip, rippled_branch_list[index])
         public_key, validator_token = get_validator_tool_data(ip)
-        IPS.append(ec2Instance.public_ip_address)
+        IPS.append(ec2Instance.private_ip_address)
         PUBLIC_KEYS.append(public_key)
-        f.write(ec2Instance.public_ip_address + "\n")
+        f.write(f"Public IP: {ec2Instance.public_ip_address}\n")
+        f.write(f"Private IP: {ec2Instance.private_ip_address}\n")
         new_instance = EC2Instance(
             index=index,
             region=region,
@@ -426,7 +427,7 @@ def new_create_subnet(client, vpc, region, zone, route_table, subnet_cidr, sn_na
         raise Exception(f"Multiple subnets with name: {sn_name} found. Please delete these before proceeding.")
 
 
-def new_create_security_group(client, resource, vpc, ip, sg_name):
+def new_create_security_group(client, resource, vpc, host_ip, sg_name):
     existing_security_groups = client.describe_security_groups(
         Filters=[
             {
@@ -446,14 +447,20 @@ def new_create_security_group(client, resource, vpc, ip, sg_name):
             IpPermissions=[
                 {
                     'FromPort': 22,
+                    'ToPort': 22,
                     'IpProtocol': 'tcp',
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': 'SSH Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host SSH Access'
                         },
                     ],
-                    'ToPort': 22,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group SSH Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": -1,
@@ -461,76 +468,118 @@ def new_create_security_group(client, resource, vpc, ip, sg_name):
                     "IpProtocol": "icmp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': 'Ping Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host Ping Access'
                         }
-                    ]
+                    ],
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group Ping Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 80,
+                    'ToPort': 80,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': 'HTTP Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host HTTP Access'
                         }
                     ],
-                    'ToPort': 80,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group HTTP Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 443,
+                    'ToPort': 443,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': 'HTTPS Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host HTTPS Access'
                         }
                     ],
-                    'ToPort': 443,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group HTTPS Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 51234,
+                    'ToPort': 51234,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': '51234 Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host 51234 Access'
                         }
                     ],
-                    'ToPort': 51234,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group 51234 Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 2459,
+                    'ToPort': 2459,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': '2459 Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host 2459 Access'
                         }
                     ],
-                    'ToPort': 2459,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group 2459 Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 6006,
+                    'ToPort': 6006,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': '6006 Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host 6006 Access'
                         }
                     ],
-                    'ToPort': 6006,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group 6006 Access'
+                        }
+                    ],
                 },
                 {
                     "FromPort": 50051,
+                    'ToPort': 50051,
                     "IpProtocol": "tcp",
                     'IpRanges': [
                         {
-                            'CidrIp': '{}/0'.format(ip),
-                            'Description': '50051 Access'
+                            'CidrIp': '{}/32'.format(host_ip),
+                            'Description': 'Host 50051 Access'
                         }
                     ],
-                    'ToPort': 50051,
+                    'UserIdGroupPairs': [
+                        {
+                            'GroupId': secGroup.id,
+                            'Description': 'Security Group 50051 Access'
+                        }
+                    ],
                 }
             ]
         )
