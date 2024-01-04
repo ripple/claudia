@@ -355,7 +355,7 @@ elif sidebar_selection == "XRPL Tests":
                     client_type = "websocket"
                     invalidate_cache = st.radio(
                         'Invalidate cache?',
-                        ('true', 'false'))
+                        ('false', 'true'))
             with col3:
                 network = st.radio(
                     'Choose network',
