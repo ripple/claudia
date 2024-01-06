@@ -10,8 +10,8 @@ cppstd=20
 
 REMOUNT_VOLUME="false"
 SILENT="silent"
-DOCKER_RIPPLED_IMAGE="ksaxena0405/rippled-base:latest"
-DOCKER_WITNESS_IMAGE="ksaxena0405/witness-server-base:latest"
+DOCKER_RIPPLED_IMAGE="ubuntu:22.04"
+DOCKER_WITNESS_IMAGE="ubuntu:22.04"
 DOCKER_NETWORK="rippled"
 RIPPLED_NODE_CONTAINER_NAME=rippled_node
 WITNESS_SERVER_CONTAINER_NAME=witness_node
@@ -218,14 +218,10 @@ install_conan() {
 }
 
 install_prerequisites() {
-  install_prerequisites_opt="$1"
-
-  if [ "${install_prerequisites_opt}" = "true" ]; then
-    install_os_packages
-    update_gcc
-    install_cmake
-    install_conan
-  fi
+  install_os_packages
+  update_gcc
+  install_cmake
+  install_conan
 }
 
 build_rippled() {
@@ -752,18 +748,25 @@ disable_feature() {
 clean() {
   clean_opt="$1"
   if [ "${clean_opt}" = "true" ]; then
-    echo "- Clean up Claudia"
+    # Remove rippled node containers
     docker rm -f $(docker ps -aq --filter ancestor=${RIPPLED_NODE_CONTAINER_NAME}) > /dev/null 2>&1
+    # Remove rippled image
     docker rmi -f ${RIPPLED_NODE_CONTAINER_NAME} > /dev/null 2>&1
+    # Remove witness nodes
     docker rm -f $(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME}) > /dev/null 2>&1
+    # Remove witness image
     docker rmi -f ${WITNESS_SERVER_CONTAINER_NAME} > /dev/null 2>&1
+    # Remove rippled_build container
+    docker rm -f $(docker ps -aq --filter name=${RIPPLED_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
+    # Remove wintess_build container
+    docker rm -f $(docker ps -aq --filter name=${WITNESS_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
+
     rm -f "${INSTALL_MODE_FILE}" > /dev/null 2>&1
     rm -rf $HOME/logs > /dev/null 2>&1
     rm -rf $HOME/rippled_log > /dev/null 2>&1
     rm -rf $HOME/rippled_db > /dev/null 2>&1
     rm -f ${RIPPLED_REPO_BUILT} > /dev/null 2>&1
     rm -f ${WITNESS_REPO_BUILT} > /dev/null 2>&1
-
   fi
 }
 

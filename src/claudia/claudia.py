@@ -892,7 +892,6 @@ def setup_system_test_env(lib, client_type, network, tag, feature, invalidate_ca
             raise Exception("Client Type {} is not supported with {} library client.".format(client_type, lib))
         set_to_js_wd()
         if invalidate_cache != 'false':
-            click.echo("Invalidating cache...")
             command = "rm -rf ./node_modules"
             subprocess.call(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         install_js_dependencies()
