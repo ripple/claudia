@@ -11,7 +11,6 @@ WORK_DIR="/tmp/work_dir"
 use_existing_log_dir="false"
 build_rippled_opt="false"
 build_witness_opt="false"
-#install_prerequisites_opt="false"
 repo=""
 
 trap cleanup EXIT
@@ -86,10 +85,6 @@ while [ "$1" != "" ]; do
     LOG_DIR="${LOG_BASE_DIR}/$(basename "$1")"
     ;;
 
-#  --installPrerequisites)
-#    install_prerequisites_opt="true"
-#    ;;
-
   --help | *)
     usage
     ;;
@@ -98,7 +93,6 @@ while [ "$1" != "" ]; do
 done
 
 prepare_workspace
-#install_prerequisites "${install_prerequisites_opt}"
 install_prerequisites
 build_rippled "${build_rippled_opt}" "${repo}"
 build_witness "${build_witness_opt}" "${repo}"

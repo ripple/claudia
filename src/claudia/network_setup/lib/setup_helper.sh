@@ -10,9 +10,7 @@ cppstd=20
 
 REMOUNT_VOLUME="false"
 SILENT="silent"
-#DOCKER_RIPPLED_IMAGE="ksaxena0405/rippled-base:latest"
 DOCKER_RIPPLED_IMAGE="ubuntu:22.04"
-#DOCKER_WITNESS_IMAGE="ksaxena0405/witness-server-base:latest"
 DOCKER_WITNESS_IMAGE="ubuntu:22.04"
 DOCKER_NETWORK="rippled"
 RIPPLED_NODE_CONTAINER_NAME=rippled_node
@@ -220,14 +218,6 @@ install_conan() {
 }
 
 install_prerequisites() {
-#  install_prerequisites_opt="$1"
-#
-#  if [ "${install_prerequisites_opt}" = "true" ]; then
-#    install_os_packages
-#    update_gcc
-#    install_cmake
-#    install_conan
-#  fi
   install_os_packages
   update_gcc
   install_cmake
@@ -766,9 +756,9 @@ clean() {
     docker rm -f $(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME}) > /dev/null 2>&1
     # Remove witness image
     docker rmi -f ${WITNESS_SERVER_CONTAINER_NAME} > /dev/null 2>&1
-    # NEW! Remove rippled_build container
+    # Remove rippled_build container
     docker rm -f $(docker ps -aq --filter name=${RIPPLED_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
-    # NEW! Remove wintess_build container
+    # Remove wintess_build container
     docker rm -f $(docker ps -aq --filter name=${WITNESS_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
 
     rm -f "${INSTALL_MODE_FILE}" > /dev/null 2>&1
@@ -777,7 +767,6 @@ clean() {
     rm -rf $HOME/rippled_db > /dev/null 2>&1
     rm -f ${RIPPLED_REPO_BUILT} > /dev/null 2>&1
     rm -f ${WITNESS_REPO_BUILT} > /dev/null 2>&1
-#    rm -f ${CLAUDIA_TMP_DIR} > /dev/null 2>&1
   fi
 }
 
