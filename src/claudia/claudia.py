@@ -4,7 +4,7 @@ import subprocess
 
 import click
 import inquirer
-from claudia.python.lib.framework.common import read_env_var
+# from claudia.python.lib.framework.common import read_env_var
 from inquirer.themes import GreenPassion
 
 from claudia.versions import XRPL_PY_VERSION, XRPL_JS_VERSION
@@ -58,29 +58,29 @@ def main():
     """Claudia says hi! Please choose a command to perform an action. A command can have multiple sub-commands and options. Use '--help' option for more information."""
 
 
-@main.command()
-def ui():
-    """Launch Claudia UI"""
-    try:
-        clear_screen()
-        launch_claudia_ui()
-    except Exception as e:
-        pass
+# @main.command()
+# def ui():
+#     """Launch Claudia UI"""
+#     try:
+#         clear_screen()
+#         launch_claudia_ui()
+#     except Exception as e:
+#         pass
 
 
-def launch_claudia_ui():
-    create_streamlit_credentials()
-    set_to_project_root_wd()
-    command = "streamlit run ui/claudia_ui.py"
-    return subprocess.call(command, shell=True)
+# def launch_claudia_ui():
+#     create_streamlit_credentials()
+#     set_to_project_root_wd()
+#     command = "streamlit run ui/claudia_ui.py"
+#     return subprocess.call(command, shell=True)
 
 
-def create_streamlit_credentials():
-    credentials_file = os.path.expanduser("~/.streamlit/credentials.toml")
-    if not os.path.isfile(credentials_file):
-        os.makedirs(os.path.dirname(credentials_file), exist_ok=True)
-        f = open(credentials_file, 'w')
-        f.write('[general]\nemail = ""\n')
+# def create_streamlit_credentials():
+#     credentials_file = os.path.expanduser("~/.streamlit/credentials.toml")
+#     if not os.path.isfile(credentials_file):
+#         os.makedirs(os.path.dirname(credentials_file), exist_ok=True)
+#         f = open(credentials_file, 'w')
+#         f.write('[general]\nemail = ""\n')
 
 
 @main.command()
@@ -100,9 +100,9 @@ def launch_main_menu():
             message="Welcome to Claudia Demo! Please use ↑ ↓ and ↵ keys to choose an option. Current Selection",
             choices=[
                 "Custom XRPL Networks",
-                "XRPL Tests",
+                # "XRPL Tests",
                 "Settings",
-                "Launch Claudia UI",
+                # "Launch Claudia UI",
                 "Exit"
             ],
         ),
@@ -113,15 +113,15 @@ def launch_main_menu():
     if selection_text == "Custom XRPL Networks":
         clear_screen()
         launch_custom_rippled_networks_menu()
-    elif selection_text == "XRPL Tests":
-        clear_screen()
-        launch_test_task_menu()
+    # elif selection_text == "XRPL Tests":
+    #     clear_screen()
+    #     launch_test_task_menu()
     elif selection_text == "Settings":
         clear_screen()
         launch_settings_menu()
-    elif selection_text == "Launch Claudia UI":
-        clear_screen()
-        launch_claudia_ui()
+    # elif selection_text == "Launch Claudia UI":
+    #     clear_screen()
+    #     launch_claudia_ui()
     elif selection_text == 'Exit':
         print("Thank you for using Claudia demo. Bye!")
         return
@@ -236,113 +236,113 @@ def launch_custom_rippled_networks_menu():
             return
 
 
-def launch_test_task_menu():
-    relaunch_wizard = True
-    questions = [
-        inquirer.List(
-            "test_task_menu",
-            message="Here you can find a list of test related tasks. Please use ↑ ↓ and ↵ keys to choose an option. Current Selection",
-            choices=[
-                "Run system tests",
-                "Run unit tests",
-                "Back to main menu"
-            ],
-        ),
-    ]
+# def launch_test_task_menu():
+#     relaunch_wizard = True
+#     questions = [
+#         inquirer.List(
+#             "test_task_menu",
+#             message="Here you can find a list of test related tasks. Please use ↑ ↓ and ↵ keys to choose an option. Current Selection",
+#             choices=[
+#                 "Run system tests",
+#                 "Run unit tests",
+#                 "Back to main menu"
+#             ],
+#         ),
+#     ]
+#
+#     selection_text = inquirer.prompt(questions, theme=GreenPassion())['test_task_menu']
+#     if selection_text == 'Run system tests':
+#         relaunch_wizard = False
+#         clear_screen()
+#         print("\nINFO: In order to '{}', run: 'claudia run systemtests'".format(selection_text))
+#         print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
+#         client_type = 'websocket'
+#         invalidate_cache = 'false'
+#         feature_files = get_feature_file_names()
+#         feature_files.append('all')
+#         lib = inquirer.prompt(
+#             [inquirer.List("confirmation", message="Please choose library type. Current Selection",
+#                            choices=["py", "js"], default="py")],
+#             theme=GreenPassion()
+#         )['confirmation']
+#         if lib == 'py':
+#             client_type = inquirer.prompt(
+#                 [inquirer.List("confirmation", message="Please choose client type. Current Selection",
+#                                choices=["websocket", "jsonrpc"], default="websocket")],
+#                 theme=GreenPassion()
+#             )['confirmation']
+#         network = inquirer.prompt(
+#             [inquirer.List("confirmation", message="Please choose network type. Current Selection",
+#                            choices=["local-mainnet", "devnet", "testnet", "local-sidechain"],
+#                            default="local-mainnet")],
+#             theme=GreenPassion()
+#         )['confirmation']
+#
+#         tag = inquirer.prompt(
+#             [inquirer.List("confirmation", message="Please choose tag. Current Selection",
+#                            choices=['smoke', 'regression', 'time_intensive'], default="smoke")],
+#             theme=GreenPassion()
+#         )['confirmation']
+#
+#         feature = inquirer.prompt(
+#             [inquirer.List("confirmation",
+#                            message="Please choose the feature file. Choose 'all' to include all feature files. Current Selection",
+#                            choices=feature_files, default="payments")],
+#             theme=GreenPassion()
+#         )['confirmation']
+#
+#         if lib == 'js':
+#             invalidate_cache = inquirer.prompt(
+#                 [inquirer.List("confirmation",
+#                                message="Please choose if you would like to destroy cache, if any. Current Selection",
+#                                choices=["false", "true"], default="false")],
+#                 theme=GreenPassion()
+#             )['confirmation']
+#
+#         launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache)
+#
+#     elif selection_text == 'Run unit tests':
+#         relaunch_wizard = False
+#         print("\nINFO: In order to '{}', run: 'claudia run unittests'".format(selection_text))
+#         print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
+#         testname = get_testname()
+#         if testname.replace("'", "").replace('"', '').lower() == 'back':
+#             relaunch_wizard = True
+#         else:
+#             launch_command_run_unit_tests(testname)
+#     elif selection_text == 'Back to main menu':
+#         clear_screen()
+#         launch_main_menu()
+#         return
+#
+#     if relaunch_wizard:
+#         clear_screen()
+#         launch_test_task_menu()
+#     else:
+#         if get_confirmation("Would you like to continue with the demo?"):
+#             clear_screen()
+#             launch_test_task_menu()
+#         else:
+#             print("Thank you for using Claudia demo. Bye!")
+#             return
 
-    selection_text = inquirer.prompt(questions, theme=GreenPassion())['test_task_menu']
-    if selection_text == 'Run system tests':
-        relaunch_wizard = False
-        clear_screen()
-        print("\nINFO: In order to '{}', run: 'claudia run systemtests'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        client_type = 'websocket'
-        invalidate_cache = 'false'
-        feature_files = get_feature_file_names()
-        feature_files.append('all')
-        lib = inquirer.prompt(
-            [inquirer.List("confirmation", message="Please choose library type. Current Selection",
-                           choices=["py", "js"], default="py")],
-            theme=GreenPassion()
-        )['confirmation']
-        if lib == 'py':
-            client_type = inquirer.prompt(
-                [inquirer.List("confirmation", message="Please choose client type. Current Selection",
-                               choices=["websocket", "jsonrpc"], default="websocket")],
-                theme=GreenPassion()
-            )['confirmation']
-        network = inquirer.prompt(
-            [inquirer.List("confirmation", message="Please choose network type. Current Selection",
-                           choices=["local-mainnet", "devnet", "testnet", "local-sidechain"],
-                           default="local-mainnet")],
-            theme=GreenPassion()
-        )['confirmation']
 
-        tag = inquirer.prompt(
-            [inquirer.List("confirmation", message="Please choose tag. Current Selection",
-                           choices=['smoke', 'regression', 'time_intensive'], default="smoke")],
-            theme=GreenPassion()
-        )['confirmation']
-
-        feature = inquirer.prompt(
-            [inquirer.List("confirmation",
-                           message="Please choose the feature file. Choose 'all' to include all feature files. Current Selection",
-                           choices=feature_files, default="payments")],
-            theme=GreenPassion()
-        )['confirmation']
-
-        if lib == 'js':
-            invalidate_cache = inquirer.prompt(
-                [inquirer.List("confirmation",
-                               message="Please choose if you would like to destroy cache, if any. Current Selection",
-                               choices=["false", "true"], default="false")],
-                theme=GreenPassion()
-            )['confirmation']
-
-        launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache)
-
-    elif selection_text == 'Run unit tests':
-        relaunch_wizard = False
-        print("\nINFO: In order to '{}', run: 'claudia run unittests'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        testname = get_testname()
-        if testname.replace("'", "").replace('"', '').lower() == 'back':
-            relaunch_wizard = True
-        else:
-            launch_command_run_unit_tests(testname)
-    elif selection_text == 'Back to main menu':
-        clear_screen()
-        launch_main_menu()
-        return
-
-    if relaunch_wizard:
-        clear_screen()
-        launch_test_task_menu()
-    else:
-        if get_confirmation("Would you like to continue with the demo?"):
-            clear_screen()
-            launch_test_task_menu()
-        else:
-            print("Thank you for using Claudia demo. Bye!")
-            return
-
-
-def launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache):
-    try:
-        click.echo("INFO: Navigate to '{}' to view explorer.\n".format(get_explorer_url(network)))
-        setup_system_test_env(lib, client_type, network, tag, feature, invalidate_cache)
-        print("Setting CONNECTION_SCHEME='{}', CONNECTION_URL='{}' and CONNECTION_TYPE='{}'".format(
-            read_env_var('CONNECTION_SCHEME'),
-            read_env_var('CONNECTION_URL'),
-            read_env_var('CONNECTION_TYPE'))
-        )
-
-        command = get_launch_command_system_test_tests(lib, tag, feature)
-        subprocess.call(command, shell=True)
-        teardown_system_test_env(lib)
-    except Exception as e:
-        set_to_project_root_wd()
-        raise e
+# def launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache):
+#     try:
+#         click.echo("INFO: Navigate to '{}' to view explorer.\n".format(get_explorer_url(network)))
+#         setup_system_test_env(lib, client_type, network, tag, feature, invalidate_cache)
+#         print("Setting CONNECTION_SCHEME='{}', CONNECTION_URL='{}' and CONNECTION_TYPE='{}'".format(
+#             read_env_var('CONNECTION_SCHEME'),
+#             read_env_var('CONNECTION_URL'),
+#             read_env_var('CONNECTION_TYPE'))
+#         )
+#
+#         command = get_launch_command_system_test_tests(lib, tag, feature)
+#         subprocess.call(command, shell=True)
+#         teardown_system_test_env(lib)
+#     except Exception as e:
+#         set_to_project_root_wd()
+#         raise e
 
 
 def launch_settings_menu():
@@ -358,7 +358,7 @@ def launch_settings_menu():
                 "Disable a rippled feature",
                 "Clean up the host and free resources",
                 "List system requirements (prerequisites)",
-                "List system test features",
+                # "List system test features",
                 "Print already built/installed rippled version",
                 "Back to main menu"
             ],
@@ -366,13 +366,14 @@ def launch_settings_menu():
     ]
 
     selection_text = inquirer.prompt(questions, theme=GreenPassion())['misc_task_menu']
-    if selection_text == 'List system test features':
-        relaunch_wizard = False
-        clear_screen()
-        print("\nINFO: In order to '{}', run: 'claudia list system-test-features'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        launch_command_system_test_features()
-    elif selection_text == 'List system requirements (prerequisites)':
+    # if selection_text == 'List system test features':
+    #     relaunch_wizard = False
+    #     clear_screen()
+    #     print("\nINFO: In order to '{}', run: 'claudia list system-test-features'".format(selection_text))
+    #     print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
+    #     launch_command_system_test_features()
+    # el
+    if selection_text == 'List system requirements (prerequisites)':
         relaunch_wizard = False
         clear_screen()
         print("\nINFO: In order to '{}', run: 'claudia list system-requirements'".format(selection_text))
@@ -590,23 +591,23 @@ def list():
     """List supported options"""
 
 
-@list.command()
-def system_test_features():
-    """List all supported features to be tested"""
-    launch_command_system_test_features()
+# @list.command()
+# def system_test_features():
+#     """List all supported features to be tested"""
+#     launch_command_system_test_features()
+#
+#
+# def launch_command_system_test_features():
+#     click.echo(get_launch_command_system_test_features_message())
 
 
-def launch_command_system_test_features():
-    click.echo(get_launch_command_system_test_features_message())
-
-
-def get_launch_command_system_test_features_message():
-    set_to_project_root_wd()
-    features = os.listdir('./features/')
-    message = "Following features were found:\n"
-    for i in range(0, len(features)):
-        message += "   - {}\n".format(features[i].replace(".feature", ""))
-    return message
+# def get_launch_command_system_test_features_message():
+#     set_to_project_root_wd()
+#     features = os.listdir('./features/')
+#     message = "Following features were found:\n"
+#     for i in range(0, len(features)):
+#         message += "   - {}\n".format(features[i].replace(".feature", ""))
+#     return message
 
 
 @local_sidechain.command()
@@ -861,202 +862,202 @@ def get_explorer_url(network):
     return url
 
 
-@run.command()
-@click.pass_context
-@click.option('--lib', default='py',
-              help="The type of client library to be used for running the tests. Allowed values are 'py' and 'js' and is defaulted to 'py'.  \n\nMore information: https://xrpl.org/client-libraries.html#client-libraries")
-@click.option('--client_type', default='websocket',
-              help="The type of client to be used. This flag should only be used with 'py' library. Allowed values are 'websocket' and 'jsonrpc' and is defaulted to 'websocket'.  \n\nMore information: https://xrpl.org/get-started-using-http-websocket-apis.html#differences-between-json-rpc-and-websocket")
-@click.option('--network', default='local-mainnet',
-              help="The type of network to be used. Allowed values are 'devnet', 'testnet', 'local-mainnet', and 'local-sidechain'; and is defaulted to 'local-mainnet'.  \n\nMore information: https://xrpl.org/get-started-using-http-websocket-apis.html#differences-between-json-rpc-and-websocket")
-@click.option('--tag', default='smoke',
-              help="Tag name of the all the tests to be included in the test run. Allowed values are 'smoke', 'regression' and 'time_intensive' and is defaulted to 'smoke'.  \n\nMore information: https://behave.readthedocs.io/en/latest/tag_expressions.html")
-@click.option('--feature', default='payments',
-              help=compose_feature_helper_message())
-@click.option('--invalidate_cache', default='false',
-              help="Forces ignoring cache, and reinstalling dependencies. This flag should only be used with 'js' library. Allowed values are 'true' and 'false' and is defaulted to 'false'.")
-def systemtests(context, lib, client_type, network, tag, feature, invalidate_cache):
-    """Launch XRPL system tests using XRPL client library"""
-    launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache)
+# @run.command()
+# @click.pass_context
+# @click.option('--lib', default='py',
+#               help="The type of client library to be used for running the tests. Allowed values are 'py' and 'js' and is defaulted to 'py'.  \n\nMore information: https://xrpl.org/client-libraries.html#client-libraries")
+# @click.option('--client_type', default='websocket',
+#               help="The type of client to be used. This flag should only be used with 'py' library. Allowed values are 'websocket' and 'jsonrpc' and is defaulted to 'websocket'.  \n\nMore information: https://xrpl.org/get-started-using-http-websocket-apis.html#differences-between-json-rpc-and-websocket")
+# @click.option('--network', default='local-mainnet',
+#               help="The type of network to be used. Allowed values are 'devnet', 'testnet', 'local-mainnet', and 'local-sidechain'; and is defaulted to 'local-mainnet'.  \n\nMore information: https://xrpl.org/get-started-using-http-websocket-apis.html#differences-between-json-rpc-and-websocket")
+# @click.option('--tag', default='smoke',
+#               help="Tag name of the all the tests to be included in the test run. Allowed values are 'smoke', 'regression' and 'time_intensive' and is defaulted to 'smoke'.  \n\nMore information: https://behave.readthedocs.io/en/latest/tag_expressions.html")
+# @click.option('--feature', default='payments',
+#               help=compose_feature_helper_message())
+# @click.option('--invalidate_cache', default='false',
+#               help="Forces ignoring cache, and reinstalling dependencies. This flag should only be used with 'js' library. Allowed values are 'true' and 'false' and is defaulted to 'false'.")
+# def systemtests(context, lib, client_type, network, tag, feature, invalidate_cache):
+#     """Launch XRPL system tests using XRPL client library"""
+#     launch_command_run_system_tests(lib, client_type, network, tag, feature, invalidate_cache)
 
 
-def setup_system_test_env(lib, client_type, network, tag, feature, invalidate_cache):
-    if lib == 'py':
-        if invalidate_cache != 'false':
-            raise Exception("--invalidate_cache flag is supported not with {} library client.".format(lib))
-        set_to_py_wd()
-        set_python_launch_vars(network, client_type)
-        load_feature_files()
-    elif lib == 'js':
-        if client_type != 'websocket':
-            raise Exception("Client Type {} is not supported with {} library client.".format(client_type, lib))
-        set_to_js_wd()
-        if invalidate_cache != 'false':
-            command = "rm -rf ./node_modules"
-            subprocess.call(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        install_js_dependencies()
-        set_javascript_launch_vars(network)
-        load_feature_files()
-    else:
-        raise Exception("Invalid library type: {}".format(lib))
+# def setup_system_test_env(lib, client_type, network, tag, feature, invalidate_cache):
+#     if lib == 'py':
+#         if invalidate_cache != 'false':
+#             raise Exception("--invalidate_cache flag is supported not with {} library client.".format(lib))
+#         set_to_py_wd()
+#         set_python_launch_vars(network, client_type)
+#         load_feature_files()
+#     elif lib == 'js':
+#         if client_type != 'websocket':
+#             raise Exception("Client Type {} is not supported with {} library client.".format(client_type, lib))
+#         set_to_js_wd()
+#         if invalidate_cache != 'false':
+#             command = "rm -rf ./node_modules"
+#             subprocess.call(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+#         install_js_dependencies()
+#         set_javascript_launch_vars(network)
+#         load_feature_files()
+#     else:
+#         raise Exception("Invalid library type: {}".format(lib))
 
 
-def get_launch_command_system_test_tests(lib, tag, feature):
-    if lib == 'py':
-        if feature == "all":
-            command = "behave --no-skipped --tags={}".format(tag)
-        else:
-            command = "behave --no-skipped --tags={} ./features/{}.feature".format(tag, feature)
-    elif lib == 'js':
-        if feature == "all":
-            command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{}".format(tag)
-        else:
-            command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{} ./features/{}.feature".format(
-                tag,
-                feature
-            )
-    return command
+# def get_launch_command_system_test_tests(lib, tag, feature):
+#     if lib == 'py':
+#         if feature == "all":
+#             command = "behave --no-skipped --tags={}".format(tag)
+#         else:
+#             command = "behave --no-skipped --tags={} ./features/{}.feature".format(tag, feature)
+#     elif lib == 'js':
+#         if feature == "all":
+#             command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{}".format(tag)
+#         else:
+#             command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{} ./features/{}.feature".format(
+#                 tag,
+#                 feature
+#             )
+#     return command
 
 
-def teardown_system_test_env(lib):
-    if lib == 'py':
-        unload_feature_files()
-        set_to_project_root_wd()
-    elif lib == 'js':
-        unload_feature_files()
-        set_to_project_root_wd()
-    else:
-        raise Exception("Invalid library type: {}".format(lib))
+# def teardown_system_test_env(lib):
+#     if lib == 'py':
+#         unload_feature_files()
+#         set_to_project_root_wd()
+#     elif lib == 'js':
+#         unload_feature_files()
+#         set_to_project_root_wd()
+#     else:
+#         raise Exception("Invalid library type: {}".format(lib))
 
 
-@run.command()
-@click.option('--testname', default='everything',
-              help="The unit test which needs to be selected. If not provided, all tests are selected.")
-def unittests(testname):
-    """Launch rippled unit tests"""
-    launch_command_run_unit_tests(testname)
+# @run.command()
+# @click.option('--testname', default='everything',
+#               help="The unit test which needs to be selected. If not provided, all tests are selected.")
+# def unittests(testname):
+#     """Launch rippled unit tests"""
+#     launch_command_run_unit_tests(testname)
+#
+#
+# def launch_command_run_unit_tests(testname):
+#     command = get_launch_command_run_unit_tests(testname)
+#     return subprocess.call(command, shell=True)
 
 
-def launch_command_run_unit_tests(testname):
-    command = get_launch_command_run_unit_tests(testname)
-    return subprocess.call(command, shell=True)
+# def get_launch_command_run_unit_tests(testname):
+#     set_to_project_root_wd()
+#     if testname == '':
+#         return "sh network_setup/setup.sh --runUnittests"
+#     else:
+#         return "sh network_setup/setup.sh --runUnittests {}".format(testname)
+#
+#
+# def set_python_launch_vars(network, client_type):
+#     if network == "local-mainnet":
+#         if client_type == "websocket":
+#             connectionScheme = "ws"
+#             connectionURL = "127.0.0.1:6001"
+#             connectionType = "websocket"
+#         elif client_type == "jsonrpc":
+#             connectionScheme = "http"
+#             connectionURL = "127.0.0.1:5001"
+#             connectionType = "jsonrpc"
+#         else:
+#             raise Exception("{} is not a valid client_type".format(client_type))
+#     elif network == "local-sidechain":
+#         if client_type == "websocket":
+#             connectionScheme = "ws"
+#             connectionURL = "127.0.0.1:6003"
+#             connectionType = "websocket"
+#         elif client_type == "jsonrpc":
+#             connectionScheme = "http"
+#             connectionURL = "127.0.0.1:5003"
+#             connectionType = "jsonrpc"
+#         else:
+#             raise Exception("{} is not a valid client_type".format(client_type))
+#     elif network == "devnet":
+#         if client_type == "websocket":
+#             connectionScheme = "wss"
+#             connectionURL = "s.devnet.rippletest.net:51233"
+#             connectionType = "websocket"
+#         elif client_type == "jsonrpc":
+#             connectionScheme = "https"
+#             connectionURL = "s.devnet.rippletest.net:51234"
+#             connectionType = "jsonrpc"
+#         else:
+#             raise Exception("{} is not a valid client_type".format(client_type))
+#     elif network == "testnet":
+#         if client_type == "websocket":
+#             connectionScheme = "wss"
+#             connectionURL = "s.altnet.rippletest.net:51233"
+#             connectionType = "websocket"
+#         elif client_type == "jsonrpc":
+#             connectionScheme = "https"
+#             connectionURL = "s.altnet.rippletest.net:51234"
+#             connectionType = "jsonrpc"
+#         else:
+#             raise Exception("{} is not a valid client_type".format(client_type))
+#     else:
+#         raise Exception("{} is not a valid network".format(network))
+#
+#     os.environ['CONNECTION_SCHEME'] = connectionScheme
+#     os.environ['CONNECTION_URL'] = connectionURL
+#     os.environ['CONNECTION_TYPE'] = connectionType
+#
+#
+# def set_javascript_launch_vars(network):
+#     if network == "local-mainnet":
+#         connectionScheme = "ws"
+#         connectionURL = "127.0.0.1:6001"
+#         connectionType = "websocket"
+#     elif network == "local-sidechain":
+#         connectionScheme = "ws"
+#         connectionURL = "127.0.0.1:6003"
+#         connectionType = "websocket"
+#     elif network == "devnet":
+#         connectionScheme = "wss"
+#         connectionURL = "s.devnet.rippletest.net:51233"
+#         connectionType = "websocket"
+#     elif network == "testnet":
+#         connectionScheme = "wss"
+#         connectionURL = "s.altnet.rippletest.net:51233"
+#         connectionType = "websocket"
+#     else:
+#         raise Exception("{} is not a valid network".format(network))
+#
+#     os.environ['CONNECTION_SCHEME'] = connectionScheme
+#     os.environ['CONNECTION_URL'] = connectionURL
+#     os.environ['CONNECTION_TYPE'] = connectionType
+#
+#
+# def load_feature_files():
+#     unload_feature_files()
+#     os.popen("cp -fr ../features/*.feature ./features")
+#
+#
+# def unload_feature_files():
+#     os.popen("rm -rf ./features/*.feature")
 
 
-def get_launch_command_run_unit_tests(testname):
-    set_to_project_root_wd()
-    if testname == '':
-        return "sh network_setup/setup.sh --runUnittests"
-    else:
-        return "sh network_setup/setup.sh --runUnittests {}".format(testname)
-
-
-def set_python_launch_vars(network, client_type):
-    if network == "local-mainnet":
-        if client_type == "websocket":
-            connectionScheme = "ws"
-            connectionURL = "127.0.0.1:6001"
-            connectionType = "websocket"
-        elif client_type == "jsonrpc":
-            connectionScheme = "http"
-            connectionURL = "127.0.0.1:5001"
-            connectionType = "jsonrpc"
-        else:
-            raise Exception("{} is not a valid client_type".format(client_type))
-    elif network == "local-sidechain":
-        if client_type == "websocket":
-            connectionScheme = "ws"
-            connectionURL = "127.0.0.1:6003"
-            connectionType = "websocket"
-        elif client_type == "jsonrpc":
-            connectionScheme = "http"
-            connectionURL = "127.0.0.1:5003"
-            connectionType = "jsonrpc"
-        else:
-            raise Exception("{} is not a valid client_type".format(client_type))
-    elif network == "devnet":
-        if client_type == "websocket":
-            connectionScheme = "wss"
-            connectionURL = "s.devnet.rippletest.net:51233"
-            connectionType = "websocket"
-        elif client_type == "jsonrpc":
-            connectionScheme = "https"
-            connectionURL = "s.devnet.rippletest.net:51234"
-            connectionType = "jsonrpc"
-        else:
-            raise Exception("{} is not a valid client_type".format(client_type))
-    elif network == "testnet":
-        if client_type == "websocket":
-            connectionScheme = "wss"
-            connectionURL = "s.altnet.rippletest.net:51233"
-            connectionType = "websocket"
-        elif client_type == "jsonrpc":
-            connectionScheme = "https"
-            connectionURL = "s.altnet.rippletest.net:51234"
-            connectionType = "jsonrpc"
-        else:
-            raise Exception("{} is not a valid client_type".format(client_type))
-    else:
-        raise Exception("{} is not a valid network".format(network))
-
-    os.environ['CONNECTION_SCHEME'] = connectionScheme
-    os.environ['CONNECTION_URL'] = connectionURL
-    os.environ['CONNECTION_TYPE'] = connectionType
-
-
-def set_javascript_launch_vars(network):
-    if network == "local-mainnet":
-        connectionScheme = "ws"
-        connectionURL = "127.0.0.1:6001"
-        connectionType = "websocket"
-    elif network == "local-sidechain":
-        connectionScheme = "ws"
-        connectionURL = "127.0.0.1:6003"
-        connectionType = "websocket"
-    elif network == "devnet":
-        connectionScheme = "wss"
-        connectionURL = "s.devnet.rippletest.net:51233"
-        connectionType = "websocket"
-    elif network == "testnet":
-        connectionScheme = "wss"
-        connectionURL = "s.altnet.rippletest.net:51233"
-        connectionType = "websocket"
-    else:
-        raise Exception("{} is not a valid network".format(network))
-
-    os.environ['CONNECTION_SCHEME'] = connectionScheme
-    os.environ['CONNECTION_URL'] = connectionURL
-    os.environ['CONNECTION_TYPE'] = connectionType
-
-
-def load_feature_files():
-    unload_feature_files()
-    os.popen("cp -fr ../features/*.feature ./features")
-
-
-def unload_feature_files():
-    os.popen("rm -rf ./features/*.feature")
-
-
-def launch_behave(tag, feature):
-    if feature == "all":
-        command = "behave --no-skipped --tags={}".format(tag)
-    else:
-        command = "behave --no-skipped --tags={} ./features/{}.feature".format(tag, feature)
-    return subprocess.call(command, shell=True)
-
-
-def install_js_dependencies():
-    command = "sh ./runSetup"
-    return subprocess.call(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-def launch_cucumber(tag, feature):
-    if feature == "all":
-        command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{}".format(tag)
-    else:
-        command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{} ./features/{}.feature".format(tag,
-                                                                                                                feature)
-    return subprocess.call(command, shell=True)
+# def launch_behave(tag, feature):
+#     if feature == "all":
+#         command = "behave --no-skipped --tags={}".format(tag)
+#     else:
+#         command = "behave --no-skipped --tags={} ./features/{}.feature".format(tag, feature)
+#     return subprocess.call(command, shell=True)
+#
+#
+# def install_js_dependencies():
+#     command = "sh ./runSetup"
+#     return subprocess.call(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+#
+#
+# def launch_cucumber(tag, feature):
+#     if feature == "all":
+#         command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{}".format(tag)
+#     else:
+#         command = "npx cucumber-js --format @cucumber/pretty-formatter --tags @{} ./features/{}.feature".format(tag,
+#                                                                                                                 feature)
+#     return subprocess.call(command, shell=True)
 
 
 if __name__ == '__main__':
