@@ -12,18 +12,18 @@ claudia.egg-info/
 **/__pycache__/
 **/node_modules/
 venv/
-
-#Python level
-./src/claudia/python/__pycache__
-./src/claudia/python/features/*.feature
-./src/claudia/python/venv/
-./src/claudia/python/.idea/
-
-# Javascript level
-./src/claudia/javascript/features/*.feature
-./src/claudia/javascript/cucumber-report.html
-./src/claudia/javascript/output
-
+#
+##Python level
+#./src/claudia/python/__pycache__
+#./src/claudia/python/features/*.feature
+#./src/claudia/python/venv/
+#./src/claudia/python/.idea/
+#
+## Javascript level
+#./src/claudia/javascript/features/*.feature
+#./src/claudia/javascript/cucumber-report.html
+#./src/claudia/javascript/output
+#
 
 # Network Level
 ./src/claudia/network_setup/configs/rippled/**/rippled.cfg.bak

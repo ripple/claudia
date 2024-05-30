@@ -7,7 +7,7 @@ import inquirer
 # from claudia.python.lib.framework.common import read_env_var
 from inquirer.themes import GreenPassion
 
-from claudia.versions import XRPL_PY_VERSION, XRPL_JS_VERSION
+# from claudia.versions import XRPL_PY_VERSION, XRPL_JS_VERSION
 
 
 class SingletonClass(object):
@@ -21,39 +21,40 @@ singleton = SingletonClass()
 singleton.PROJECT_ROOT_DIR = os.path.dirname(__file__)
 
 
-def set_to_js_wd():
-    os.chdir("{}/javascript/".format(singleton.PROJECT_ROOT_DIR))
-
-
-def set_to_py_wd():
-    os.chdir("{}/python/".format(singleton.PROJECT_ROOT_DIR))
+# def set_to_js_wd():
+#     os.chdir("{}/javascript/".format(singleton.PROJECT_ROOT_DIR))
+#
+#
+# def set_to_py_wd():
+#     os.chdir("{}/python/".format(singleton.PROJECT_ROOT_DIR))
 
 
 def set_to_project_root_wd():
     os.chdir(singleton.PROJECT_ROOT_DIR)
 
+#
+# def compose_feature_helper_message():
+#     message = "Feature file to be used for the test run. Allowed values are "
+#     features = get_feature_file_names()
+#     for i in range(0, len(features)):
+#         message += "'{}', ".format(features[i])
+#     message += "and 'all' and is defaulted to 'payments'. \n\nMore information: https://behave.readthedocs.io/en/latest/tutorial.html?highlight=feature#feature-files."
+#     return message
 
-def compose_feature_helper_message():
-    message = "Feature file to be used for the test run. Allowed values are "
-    features = get_feature_file_names()
-    for i in range(0, len(features)):
-        message += "'{}', ".format(features[i])
-    message += "and 'all' and is defaulted to 'payments'. \n\nMore information: https://behave.readthedocs.io/en/latest/tutorial.html?highlight=feature#feature-files."
-    return message
 
-
-def get_feature_file_names():
-    set_to_project_root_wd()
-    files = os.listdir('./features/')
-    features = []
-    for i in range(0, len(files)):
-        features.append(files[i].replace(".feature", ""))
-
-    return features
+# def get_feature_file_names():
+#     set_to_project_root_wd()
+#     files = os.listdir('./features/')
+#     features = []
+#     for i in range(0, len(files)):
+#         features.append(files[i].replace(".feature", ""))
+#
+#     return features
 
 
 @click.group()
-@click.version_option(message=f'%(prog)s version %(version)s\n  - Supports:\n    - XRPL-py v{XRPL_PY_VERSION}\n    - XRPL.js v{XRPL_JS_VERSION}')
+# @click.version_option(message=f'%(prog)s version %(version)s\n  - Supports:\n    - XRPL-py v{XRPL_PY_VERSION}\n    - XRPL.js v{XRPL_JS_VERSION}')
+@click.version_option(message=f'%(prog)s version %(version)s')
 def main():
     """Claudia says hi! Please choose a command to perform an action. A command can have multiple sub-commands and options. Use '--help' option for more information."""
 
@@ -171,7 +172,7 @@ def launch_custom_rippled_networks_menu():
             print("\nINFO: In order to '{}', run: 'claudia rippled install --rippled_branch <branch_name>'".format(
                 selection_text))
             print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-            launch_command_rippled_install(rippled_branch)
+            launch_command_rippled_install(rippled_branch.lower())
     elif selection_text == 'Start local-mainnet':
         relaunch_wizard = False
         clear_screen()
@@ -468,20 +469,20 @@ def get_rippled_branch():
     return rippled_branch
 
 
-def get_testname():
-    testname = [
-        inquirer.Text('testname',
-                      message="Please enter name test name. Press ↵ (return) key to include run everything. Type 'back' to skip and go back to main menu.")
-    ]
-    return inquirer.prompt(testname, theme=GreenPassion())['testname']
+# def get_testname():
+#     testname = [
+#         inquirer.Text('testname',
+#                       message="Please enter name test name. Press ↵ (return) key to include run everything. Type 'back' to skip and go back to main menu.")
+#     ]
+#     return inquirer.prompt(testname, theme=GreenPassion())['testname']
 
 
-def get_feature_name():
-    feature_name = [
-        inquirer.Text('feature_name',
-                      message="Please enter the feature name. Type 'back' or simply press ↵ (return) key to skip and go back to main menu.")
-    ]
-    return inquirer.prompt(feature_name, theme=GreenPassion())['feature_name']
+# def get_feature_name():
+#     feature_name = [
+#         inquirer.Text('feature_name',
+#                       message="Please enter the feature name. Type 'back' or simply press ↵ (return) key to skip and go back to main menu.")
+#     ]
+#     return inquirer.prompt(feature_name, theme=GreenPassion())['feature_name']
 
 
 def get_confirmation(confirmation_message):
@@ -526,10 +527,10 @@ def set_install_mode():
     """Setup Install Mode"""
 
 
-@main.group()
-@click.pass_context
-def run(context):
-    """Run XRPL automated tests"""
+# @main.group()
+# @click.pass_context
+# def run(context):
+#     """Run XRPL automated tests"""
 
 
 @main.command()
