@@ -7,7 +7,6 @@ cmake_version=3.25.1
 gcc_version=11
 abi_version=11
 cppstd=20
-
 REMOUNT_VOLUME="false"
 SILENT="silent"
 DOCKER_RIPPLED_IMAGE="ubuntu:22.04"
@@ -767,6 +766,7 @@ clean() {
     rm -rf $HOME/rippled_db > /dev/null 2>&1
     rm -f ${RIPPLED_REPO_BUILT} > /dev/null 2>&1
     rm -f ${WITNESS_REPO_BUILT} > /dev/null 2>&1
+    rm -rf $HOME/.claudia > /dev/null 2>&1
   fi
 }
 
