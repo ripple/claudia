@@ -1,17 +1,6 @@
 import os
-
 from setuptools import setup
-
-# from setuptools import setup
-
-# from distutils.core import setup
-
 from src.claudia.versions import CLAUDIA_VERSION
-# from setuptools import setup, find_packages
-# try:
-#     from setuptools import setup, find_packages
-# except ImportError:
-#     from distutils.core import setup, find_packages
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 try:
@@ -22,7 +11,6 @@ except Exception:
 
 
 def read_requirements():
-    # print(os.getcwd())
     with open('src/claudia/requirements.txt') as req:
         content = req.read()
         requirements = content.split('\n')
@@ -33,7 +21,7 @@ def read_requirements():
 setup(
     name='claudia',
     version=CLAUDIA_VERSION,
-    description='Helper utility to manage local rippled networks',
+    description='Helper utility to manage local rippled mainnet and sidechain networks',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author="Kausty Saxena",
@@ -49,13 +37,6 @@ setup(
         "./requirements.txt",
         "./README.md",
         "./network_setup/**/*"
-        # ,
-        # "./features/*.feature",
-        # "./javascript/**/*",
-        # "./python/**/*",
-        # "./ui/**/*",
-        # "./.streamlit/**/*",
-        # "./aws/**/*"
     ]},
     include_package_data=True,
     entry_points='''
