@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  install:
+  launch_network_with_claudia:
 
     runs-on: ubuntu-latest
 
@@ -33,10 +33,6 @@ jobs:
         pip install dist/*.tar.gz
         rm -fr build/ dist/ claudia.egg-info
         claudia
-
-  launch_network_with_rippled_install:
-    steps:
-    - uses: actions/checkout@v4
     - name: Install rippled with Claudia
       run: |
         claudia rippled install --rippled_branch master
