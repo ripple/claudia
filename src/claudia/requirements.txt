@@ -4,3 +4,4 @@ setuptools
 requests
 inquirer
 watchdog
+wheel
