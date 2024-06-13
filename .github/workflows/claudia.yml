@@ -43,4 +43,4 @@ jobs:
         claudia local-mainnet start
     - name: Stop network with Claudia
       run: |
-        claudia local-mainnet start
+        claudia local-mainnet stop
