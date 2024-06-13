@@ -75,10 +75,6 @@ def launch_custom_rippled_networks_menu():
                 "Start local-mainnet",
                 "Stop local-mainnet",
                 "Check local-mainnet status",
-                "Build witness server",
-                "Start local-sidechain",
-                "Stop local-sidechain",
-                "Check witness server status",
                 "Back to main menu"
             ],
         ),
@@ -126,35 +122,6 @@ def launch_custom_rippled_networks_menu():
         print("\nINFO: In order to '{}', run: 'claudia local-mainnet stop'".format(selection_text))
         print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
         launch_command_network_stop()
-    elif selection_text == 'Build witness server':
-        relaunch_wizard = False
-        repo_path = get_valid_repo_path()
-        if repo_path == "" or repo_path.replace("'", "").replace('"', '').lower() == 'back':
-            relaunch_wizard = True
-        else:
-            clear_screen()
-            print("\nINFO: In order to '{}', run: 'claudia witness build --repo <absolute_path_to_local_repo>'".format(
-                selection_text))
-            print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-            launch_command_witness_build(repo_path)
-    elif selection_text == 'Check witness server status':
-        relaunch_wizard = False
-        clear_screen()
-        print("\nINFO: In order to '{}', run: 'claudia witness status'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        launch_command_witness_status()
-    elif selection_text == 'Start local-sidechain':
-        relaunch_wizard = False
-        clear_screen()
-        print("\nINFO: In order to '{}', run: 'claudia local-sidechain start'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        launch_command_sidechain_start()
-    elif selection_text == 'Stop local-sidechain':
-        relaunch_wizard = False
-        clear_screen()
-        print("\nINFO: In order to '{}', run: 'claudia local-sidechain stop'".format(selection_text))
-        print("You have opted to execute '{}'. Starting now...\n".format(selection_text))
-        launch_command_sidechain_stop()
     elif selection_text == 'Back to main menu':
         clear_screen()
         launch_main_menu()
@@ -324,16 +291,6 @@ def local_mainnet():
 
 
 @main.group()
-def local_sidechain():
-    """Setup Sidechain"""
-
-
-@main.group()
-def witness():
-    """Setup Witness Server for Sidechain"""
-
-
-@main.group()
 def set_install_mode():
     """Setup Install Mode"""
 
@@ -395,81 +352,6 @@ def get_launch_command_disable_feature(feature):
 @main.group()
 def list():
     """List supported options"""
-
-
-@local_sidechain.command()
-def start():
-    """Start a new sidechain"""
-    launch_command_sidechain_start()
-
-
-def launch_command_sidechain_start():
-    command = get_launch_command_sidechain_start()
-    return subprocess.call(command, shell=True)
-
-
-def get_launch_command_sidechain_start():
-    set_to_project_root_wd()
-    return "sh network_setup/setup.sh --sidechainStart"
-
-
-@local_sidechain.command()
-def stop():
-    """Stop sidechain"""
-    launch_command_sidechain_stop()
-
-
-def launch_command_sidechain_stop():
-    command = get_launch_command_sidechain_stop()
-    return subprocess.call(command, shell=True)
-
-
-def get_launch_command_sidechain_stop():
-    set_to_project_root_wd()
-    return "sh network_setup/setup.sh --sidechainStop"
-
-
-@witness.command()
-@click.option('--repo', required=True, help="The path to a local witness server repo")
-def build(repo):
-    """Build witness server"""
-    launch_command_witness_build(repo)
-
-
-def launch_command_witness_build(repo):
-    if not os.path.isabs(repo) or not os.path.exists(repo):
-        click.echo(
-            " - ERROR: The rippled repository path '{}' is not correct. Please provide correct absolute path!".format(repo))
-        return
-
-    command = get_launch_command_witness_build(repo)
-    return subprocess.call(command, shell=True)
-
-
-def get_launch_command_witness_build(repo):
-    set_to_project_root_wd()
-    return "sh network_setup/setup.sh --witnessBuild --repo {}".format(repo)
-
-
-@witness.command()
-def status():
-    """Witness server status"""
-    launch_command_witness_status()
-
-
-def launch_command_witness_status():
-    command = get_launch_command_witness_status()
-    return subprocess.call(command, shell=True)
-
-
-def get_launch_command_witness_status():
-    set_to_project_root_wd()
-    return "sh network_setup/setup.sh --witnessStatus"
-
-
-def get_launch_command_deploy_network(count):
-    set_to_project_root_wd()
-    return f"sh aws/setup.sh --deployNetwork --nodeCount {count}"
 
 
 @set_install_mode.command()
@@ -610,7 +492,7 @@ def stop():
 
 
 def launch_command_network_stop():
-    command = get_launch_command_sidechain_stop()
+    command = get_launch_command_network_stop()
     return subprocess.call(command, shell=True)
 
 
@@ -641,8 +523,6 @@ def get_explorer_url(network):
         url = "https://testnet.xrpl.org"
     elif network == 'devnet':
         url = "https://devnet.xrpl.org"
-    elif network == "local-sidechain":
-        url = "https://custom.xrpl.org/localhost:6003"
     else:
         url = "https://custom.xrpl.org/localhost:6001"
 
