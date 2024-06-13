@@ -35,8 +35,6 @@ jobs:
         claudia
     - name: Install rippled with Claudia
       run: |
-        mkdir -p lib/rippled/db
-        chmod 777 lib/rippled/db
         claudia rippled install --rippled_branch master
     - name: Start network with Claudia
       run: |
