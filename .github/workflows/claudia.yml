@@ -8,21 +8,16 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-
 jobs:
   launch_network_with_claudia:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         version: [ 10, 11, 12, x ]
-
+    name: "Install Python 3.${{ matrix.version }}"
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
+    - name: "Set up Python 3.${{ matrix.version }}"
       uses: actions/setup-python@v3
       with:
         python-version: "3.${{ matrix.version }}"
