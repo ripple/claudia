@@ -1,0 +1,41 @@
+# This workflow will install Claudia after installing Python dependencies, installs rippled and launches a network.
+
+name: Claudia
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  launch_network_with_claudia:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ 10, 11, 12, x ]
+    name: "Install Python 3.${{ matrix.version }}"
+    steps:
+    - uses: actions/checkout@v4
+    - name: "Set up Python 3.${{ matrix.version }}"
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.${{ matrix.version }}"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+        pip install -r ./src/claudia/requirements.txt
+    - name: Install Claudia locally
+      run: |
+        python3 setup.py sdist bdist_wheel
+        pip install dist/*.tar.gz
+    - name: Install rippled with Claudia
+      run: |
+        claudia rippled install --rippled_branch master
+    - name: Start network with Claudia
+      run: |
+        claudia local-mainnet start
+    - name: Stop network with Claudia
+      run: |
+        claudia local-mainnet stop
