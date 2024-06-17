@@ -10,7 +10,6 @@ LOG_DIR="${LOG_BASE_DIR}/logs_$(date +%Y%m%d_%H%M%S)"
 WORK_DIR="/tmp/work_dir"
 use_existing_log_dir="false"
 build_rippled_opt="false"
-build_witness_opt="false"
 repo=""
 
 trap cleanup EXIT
@@ -43,9 +42,6 @@ prepare_workspace() {
   if [ -z "${repo}" ]; then
     if [ "${build_rippled_opt}" = "true" ]; then
       repo="${HOME}/rippled"
-    elif [ "${build_witness_opt}" = "true" ]; then
-      repo="${HOME}/xbridge_witness"
-    fi
   fi
 
   if [ ! -d "${repo}" ]; then
@@ -75,10 +71,6 @@ while [ "$1" != "" ]; do
     build_rippled_opt="true"
     ;;
 
-  --buildWitness)
-    build_witness_opt="true"
-    ;;
-
   --logDir)
     shift
     use_existing_log_dir="true"
@@ -95,4 +87,3 @@ done
 prepare_workspace
 install_prerequisites
 build_rippled "${build_rippled_opt}" "${repo}"
-build_witness "${build_witness_opt}" "${repo}"

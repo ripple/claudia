@@ -1,7 +1,7 @@
 # Claudia
 Claudia is a helper utility that simplifies setting up and managing a development environment for the XRP Ledger. 
-It helps the user to run a local network using a built/installed instance of rippled. It can also launch a sidechain network. 
-These networks can be later used to perform local testing and debugging.
+It helps the user to run a local network using a built/installed instance of rippled. 
+This network can be used to perform local testing and debugging.
 
 Claudia was developed by the XRPL Automation Team as an internal tool to help with XRPL local development, debugging and
 testing. As the tool matured, the team quickly realized its potential and decided to expose it outside of Ripple, so
@@ -12,9 +12,6 @@ Following are some of the important tasks that can be performed using Claudia:
 - Build rippled from local code.
 - Install rippled from pre-built binaries released by Ripple.
 - Manage a local-mainnet network using local rippled instance.
-- Locally build a local witness server to start a sidechain network.
-- Manage a local-sidechain network.
-- Manage rippled features on the local-mainnet and local-sidechain networks.
 
 ---
 
@@ -93,8 +90,7 @@ even learn a few XRPL tricks. This section walks you through some major features
 ### How to build rippled?
 
 Claudia offers a way to build rippled from local code. You will need to
-clone [rippled](https://github.com/XRPLF/rippled) repository first before starting with this step. If you intend to use
-sidechain functionality, please use [this](https://github.com/seelabs/rippled/tree/xbridge) rippled fork instead.
+clone [rippled](https://github.com/XRPLF/rippled) repository first before starting with this step.
 
 Once the repository has been cloned, you can build rippled as follows. Each option would require you to provide the ***absolute path*** to the cloned repository.
 
@@ -151,18 +147,6 @@ You can follow these instructions to disable a rippled feature:
 - Demo Mode
     - Select `Settings` -> `Disable a rippled feature`
 
-### How to build witness server?
-
-Before you can start a sidechain network, you will need to build a witness server locally. You will need to
-clone [XBridge Witness](https://github.com/seelabs/xbridge_witness) repository first before starting on this step. Once
-the repository has been cloned, you can build the witness server as follows. Each option would require you to provide
-the absolute path to the cloned repository.
-
-- CLI Mode
-    - Run `claudia witness build --repo <repo_path>`
-- Demo Mode
-    - Select `Custom XRPL Networks` -> `Build witness server`
-
 ### How to start a local-mainnet network?
 
 Before you can start a local mainnet network, rippled has to be built or installed locally. Afterwards, you can follow
@@ -185,39 +169,6 @@ You can follow these instructions to stop a local mainnet network:
     - Run `claudia local-mainnet stop`
 - Demo Mode
     - Select `Custom XRPL Networks` -> `Stop local-mainnet`
-
-### How to start a local-sidechain network?
-
-Before you can start a local sidechain network:
-
-1. rippled has to be built/installed locally.
-2. Witness server has to be built locally.
-3. `XChainBridge` rippled feature has to be enabled.
-4. The local-mainnet network has to be running.
-
-Once all the requirements have been met, you can start the local sidechain network as follows:
-
-- CLI Mode
-    - Run `claudia local-sidechain start`
-- Demo Mode
-    - Select `Custom XRPL Networks` -> `Start local-sidechain`
-
-This can take up to a minute. Once the network has been launched, you can access the network as follows:
-- WebSocket (ws): 127.0.0.1:6003
-- JSON-RPC (http): 127.0.0.1:5003
-- 
-
-### How to stop a local-sidechain network?
-
-You can follow these instructions to stop a local sidechain network:
-
-- CLI Mode
-    - Run `claudia local-sidechain stop`
-- Demo Mode
-    - Select `Custom XRPL Networks` -> `Stop local-sidechain`
-
-Please note that once the sidechain has been stopped, local-mainnet has to be restarted before attempting to start the
-local-sidechain again.
 
 ### How to clean up your computer and free resources after running Claudia?
 

@@ -10,12 +10,9 @@ cppstd=20
 REMOUNT_VOLUME="false"
 SILENT="silent"
 DOCKER_RIPPLED_IMAGE="ubuntu:22.04"
-DOCKER_WITNESS_IMAGE="ubuntu:22.04"
 DOCKER_NETWORK="rippled"
 RIPPLED_NODE_CONTAINER_NAME=rippled_node
-WITNESS_SERVER_CONTAINER_NAME=witness_node
 RIPPLED_BUILD_CONTAINER_NAME=rippled_build
-WITNESS_BUILD_CONTAINER_NAME=witness_build
 MAC_CHROME_BROWSER="/Applications/Google Chrome.app"
 LINUX_CHROME_BROWSER="chrome"
 EXPLORER_URL_PREFIX="https://custom.xrpl.org"
@@ -23,23 +20,16 @@ BUILD_DIR_NAME="linux_build"
 CONFIGS_DIR_NAME="configs"
 INSTALL_MODE_FILE="${CLAUDIA_TMP_DIR}/install_mode"
 RIPPLED_BIN_PATH="/opt/ripple/bin"
-RIPPLED_BUILD_CONTAINER_CONFIG_PATH="/opt/xbridge_witness/etc"
 RIPPLED_REPO_VALIDITY_CHECK_FILE="src/ripple/protocol/Feature.h"
-WITNESS_REPO_VALIDITY_CHECK_FILE="src/xbwd/rpc/RPCCall.h"
 RIPPLED_REPO_BUILT="${CLAUDIA_TMP_DIR}/rippled_repo_built"
-WITNESS_REPO_BUILT="${CLAUDIA_TMP_DIR}/witness_repo_built"
 RIPPLED_CONFIG_FEATURES_STANZA_NAME="\[features\]"
 CONTAINER_HOME="/root"
 RIPPLED_BUILD_CONTAINER_SCRIPT_DIR="${CONTAINER_HOME}/network_setup"
 RIPPLED_BUILD_CONTAINER_LOG_DIR="${CONTAINER_HOME}/logs"
 RIPPLED_BUILD_CONTAINER_HOST_RIPPLED_EXEC_LOC="${CONTAINER_HOME}/host_rippled_exec"
-RIPPLED_BUILD_CONTAINER_HOST_WITNESS_EXEC_LOC="${CONTAINER_HOME}/host_witness_exec"
 RIPPLED_BUILD_CONTAINER_BUILD_SCRIPT="${RIPPLED_BUILD_CONTAINER_SCRIPT_DIR}/lib/build.sh"
-RIPPLED_BUILD_CONTAINER_WITNESS_ACTION_SCRIPT="${RIPPLED_BUILD_CONTAINER_SCRIPT_DIR}/lib/witness_action.sh"
 RIPPLED_BUILD_CONTAINER_RIPPLED_HOME="${CONTAINER_HOME}/rippled"
-RIPPLED_BUILD_CONTAINER_WITNESS_HOME="${CONTAINER_HOME}/xbridge_witness"
 RIPPLED_CONFIGS_DIR="${CONFIGS_DIR_NAME}/rippled"
-WITNESS_CONFIGS_DIR="${CONFIGS_DIR_NAME}/sidechain/witness"
 RIPPLED_CONFIGS_FILE="${RIPPLED_CONFIGS_DIR}/rippled_*/rippled.cfg"
 RIPPLED_BUILD_CONTAINER_BUILT_RIPPLED_EXEC="${RIPPLED_BUILD_CONTAINER_RIPPLED_HOME}/${BUILD_DIR_NAME}/rippled"
 RIPPLED_BUILD_CONTAINER_INSTALLED_RIPPLED_EXEC="${RIPPLED_BIN_PATH}/rippled"
@@ -49,9 +39,7 @@ RIPPLED_NODE_DOCKER_FILE_INSTALL_MODE="${RIPPLED_NODE_DOCKER_FILE_DIR}/Dockerfil
 NETWORK_VALIDATION_SCRIPT="${SCRIPT_PATH}/lib/validate_network.py"
 XCHAIN_BRIDGE_CREATE_SCRIPT="${SCRIPT_PATH}/lib/xchain_bridge_create.py"
 DOCKER_NETWORK_CONFIG="${SCRIPT_PATH}/lib/rippled_network.yml"
-DOCKER_XCHAIN_NETWORK_CONFIG="${SCRIPT_PATH}/lib/sidechain_network.yml"
 RIPPLED_EXEC_RELATIVE_BUILD_PATH="${BUILD_DIR_NAME}/rippled"
-WITNESS_EXEC_RELATIVE_BUILD_PATH="${BUILD_DIR_NAME}/xbridge_witnessd"
 package_versions_log="${LOG_DIR}/package_versions.log"
 
 detect_update_install_mode() {
@@ -107,22 +95,10 @@ is_rippled_built() {
   fi
 }
 
-is_witness_built() {
-  witness_exec_loc_saved_in_container=$(docker exec ${WITNESS_BUILD_CONTAINER_NAME} cat "${RIPPLED_BUILD_CONTAINER_HOST_WITNESS_EXEC_LOC}" 2> /dev/null)
-  if [ ! -f "${witness_exec_loc_saved_in_container}" ]; then
-    echo "xbridge_witness binary not found. Rebuild xbridge_witnessd if required"
-    exit 1
-  fi
-}
-
 set_network_config() {
   network="$1"
-
   if [ "${network}" = "rippled" ]; then
     network_config="${DOCKER_NETWORK_CONFIG}"
-  fi
-  if [ "${network}" = "sidechain" ]; then
-    network_config="${DOCKER_XCHAIN_NETWORK_CONFIG}"
   fi
 }
 
@@ -258,46 +234,6 @@ build_rippled() {
   fi
 }
 
-build_witness() {
-  l_build_witness_opt="$1"
-  repo="$2"
-
-  if [ "${l_build_witness_opt}" = "true" ]; then
-    reset_timer
-    echo "- Build witness"
-
-    CWD=$(pwd)
-    build_path="${repo}/${BUILD_DIR_NAME}"
-    mkdir -p "${build_path}" ; cd "${build_path}" || exit
-    echo "  . conan install"
-    time_now="$(date +%Y%m%d_%H%M%S)"
-    conan install .. --output-folder . --build missing --settings build_type=Release > "${LOG_DIR}/${time_now}_witness_conan_install.log" 2>&1
-    exit_on_error $? "${SILENT}"
-
-    time_now="$(date +%Y%m%d_%H%M%S)"
-    if [ -f "${RIPPLED_BUILD_CONTAINER_BUILT_RIPPLED_EXEC}" ]; then
-      rippled_build_path=$(dirname "${RIPPLED_BUILD_CONTAINER_BUILT_RIPPLED_EXEC}")
-      rippled_home=$(dirname "${rippled_build_path}")
-      echo "  . Using prebuilt rippled home: ${rippled_home}"
-      cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
-        -DRIPPLE_SRC_DIR="${rippled_home}" \
-        -DRIPPLE_BIN_DIR="${rippled_build_path}" \
-        -DCMAKE_BUILD_TYPE=Release .. > "${LOG_DIR}/${time_now}_witness_cmake.log" 2>&1
-    else
-      cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Release .. > "${LOG_DIR}/${time_now}_witness_cmake.log" 2>&1
-    fi
-    exit_on_error $? "${SILENT}"
-
-    echo "  . cmake"
-    time_now="$(date +%Y%m%d_%H%M%S)"
-    cmake --build . -- -j $(nproc) > "${LOG_DIR}/${time_now}_witness_cmake_build.log" 2>&1
-    exit_on_error $? "${SILENT}"
-    cd "${CWD}" || exit
-    print_elapsed_time
-  fi
-}
-
 remount_repo_volume() {
   repo_to_mount="$1"
   build_container="$2"
@@ -370,55 +306,6 @@ docker_install_rippled() {
   fi
 }
 
-docker_build_witness() {
-  l_build_witness_opt="$1"
-  install_mode="$2"
-  host_script_dir="$3"
-
-  if [ "${l_build_witness_opt}" = "true" ]; then
-    if [ ! -f "${repo}/${WITNESS_REPO_VALIDITY_CHECK_FILE}" ]; then
-      echo "${repo} doesn't seem to be a valid witness repository"
-      exit 1
-    fi
-
-    echo "- Docker build witness"
-    remount_repo_volume "${repo}" "${WITNESS_BUILD_CONTAINER_NAME}" "${WITNESS_REPO_BUILT}"
-    if [ ! "$(docker ps -aq --filter name=${WITNESS_BUILD_CONTAINER_NAME})" ] || [ "${REMOUNT_VOLUME}" = "true" ]; then
-      rippled_exec_loc_saved_in_container=$(docker exec "${RIPPLED_BUILD_CONTAINER_NAME}" cat "${RIPPLED_BUILD_CONTAINER_HOST_RIPPLED_EXEC_LOC}" 2> /dev/null)
-      if [ -f "${rippled_exec_loc_saved_in_container}" ]; then
-        rippled_build_path=$(dirname "${rippled_exec_loc_saved_in_container}")
-        rippled_home=$(dirname "${rippled_build_path}")
-        export RIPPLED_HOME_DIR="${rippled_home}"
-      else
-        export RIPPLED_HOME_DIR=/dev/null
-      fi
-
-      time_now="$(date +%Y%m%d_%H%M%S)"
-      log_file="${LOG_DIR}/${time_now}_witness_build.log"
-
-      docker run \
-        --net ${DOCKER_NETWORK} \
-        --name "${WITNESS_BUILD_CONTAINER_NAME}" -i -d \
-        -v "${repo}":"${RIPPLED_BUILD_CONTAINER_WITNESS_HOME}" \
-        -v "${host_script_dir}":"${RIPPLED_BUILD_CONTAINER_SCRIPT_DIR}" \
-        -v "${LOG_BASE_DIR}":"${RIPPLED_BUILD_CONTAINER_LOG_DIR}" \
-        "${DOCKER_WITNESS_IMAGE}" > "${log_file}" 2>&1
-    elif [ "$(docker ps -aq --filter name=${WITNESS_BUILD_CONTAINER_NAME} --filter status=exited)" ]; then
-      docker start "${WITNESS_BUILD_CONTAINER_NAME}"
-    fi
-
-    docker exec ${WITNESS_BUILD_CONTAINER_NAME} \
-      sh -c "rm -f ${RIPPLED_BUILD_CONTAINER_HOST_WITNESS_EXEC_LOC}"
-    docker exec ${WITNESS_BUILD_CONTAINER_NAME} \
-      sh "${RIPPLED_BUILD_CONTAINER_BUILD_SCRIPT}" --buildWitness --logDir "${LOG_DIR}"
-    exit_on_error $?
-
-    witness_exec="${repo}/${WITNESS_EXEC_RELATIVE_BUILD_PATH}"
-    docker exec ${WITNESS_BUILD_CONTAINER_NAME} \
-      sh -c "echo ${witness_exec} > ${RIPPLED_BUILD_CONTAINER_HOST_WITNESS_EXEC_LOC}"
-  fi
-}
-
 start_network() {
   l_start_network_opt="$1"
   network="$2"
@@ -436,7 +323,6 @@ start_network() {
 
       docker build --quiet -t ${RIPPLED_NODE_CONTAINER_NAME} -f "${RIPPLED_NODE_DOCKER_FILE_BUILD_MODE}" . > /dev/null 2>&1
     else
-      disable_feature true XChainBridge  # TODO: Temporary workaround until sidechain is released/packaged
       echo "- Start ${network} network (with installed rippled)"
       rippled_build_path=""
     fi
@@ -516,11 +402,10 @@ stop_all_networks() {
   is_silent=$1
 
   if [ "${is_silent}" != "${SILENT}" ]; then
-    echo "  Stop all rippled networks & witness servers"
+    echo "  Stop all rippled networks"
   fi
 
   docker rm -f $(docker ps -aq --filter ancestor=${RIPPLED_NODE_CONTAINER_NAME}) > /dev/null 2>&1
-  docker rm -f $(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME}) > /dev/null 2>&1
   if [ "${MODE}" = "${build}" ]; then
     docker rmi -f ${RIPPLED_NODE_CONTAINER_NAME} > /dev/null 2>&1
   fi
@@ -582,82 +467,6 @@ docker_rippled_version() {
         exit_on_error $?
       fi
     fi
-  fi
-}
-
-witness_action() {
-  l_witness_action_opt="$1"
-  witness_action="$2"
-  host_script_dir="$3"
-
-  if [ "${l_witness_action_opt}" = "true" ]; then
-    witness="witness"
-    action=$(echo "${witness_action}" | sed -e "s/--${witness}//g")
-    echo "- Docker ${witness} ${action}"
-    if [ -f "${WITNESS_REPO_BUILT}" ]; then
-      witness_repo=$(cat "${WITNESS_REPO_BUILT}")
-      if [ ! "$(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME})" ]; then
-        WITNESS_CONFIGS_DIR_PATH="${host_script_dir}/${WITNESS_CONFIGS_DIR}"
-        docker run \
-          --net ${DOCKER_NETWORK} \
-          --name "${WITNESS_SERVER_CONTAINER_NAME}" -i -d \
-          -v "${witness_repo}":"${RIPPLED_BUILD_CONTAINER_WITNESS_HOME}" \
-          -v "${host_script_dir}":"${RIPPLED_BUILD_CONTAINER_SCRIPT_DIR}" \
-          -v "${LOG_BASE_DIR}":"${RIPPLED_BUILD_CONTAINER_LOG_DIR}" \
-          -v "${WITNESS_CONFIGS_DIR_PATH}":"${RIPPLED_BUILD_CONTAINER_CONFIG_PATH}" \
-          "${DOCKER_WITNESS_IMAGE}" > /dev/null 2>&1
-      elif [ "$(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME} --filter status=exited)" ]; then
-        docker start "${WITNESS_SERVER_CONTAINER_NAME}"
-      fi
-
-      is_witness_built
-      docker exec ${WITNESS_SERVER_CONTAINER_NAME} \
-        sh  "${RIPPLED_BUILD_CONTAINER_WITNESS_ACTION_SCRIPT}" "${witness_action}"
-      exit_on_error $?
-
-      if [ "${witness_action}" = "--witnessStop" ]; then
-        docker rm -f ${WITNESS_SERVER_CONTAINER_NAME} > /dev/null 2>&1
-      fi
-    else
-      echo "Error: witness not built. Check help"
-      exit 1
-    fi
-  fi
-}
-
-start_sidechain() {
-  l_start_sidechain_opt="$1"
-  network="$2"
-  host_script_dir="$3"
-  witness_action="$4"
-
-  if [ "${l_start_sidechain_opt}" = "true" ]; then
-    if [ "${MODE}" = "${build}" ]; then
-      is_rippled_built
-      is_witness_built
-
-      start_network true "${network}" "${host_script_dir}"
-      WITNESS_CONFIGS_DIR_PATH="${host_script_dir}/${WITNESS_CONFIGS_DIR}"
-      python3 "${XCHAIN_BRIDGE_CREATE_SCRIPT}" --witnessConfigDir "${WITNESS_CONFIGS_DIR_PATH}"
-      witness_action true "${witness_action}" "${host_script_dir}"
-      python3 "${XCHAIN_BRIDGE_CREATE_SCRIPT}" --xChainTransfer --witnessConfigDir "${WITNESS_CONFIGS_DIR_PATH}"
-    else
-      echo "Currently, Sidechain is not support in install mode"
-      echo "Please switch to ${build} mode."
-      exit 1
-    fi
-  fi
-}
-
-stop_sidechain() {
-  l_stop_sidechain_opt="$1"
-  network="$2"
-  host_script_dir="$3"
-  witness_action="$4"
-
-  if [ "${l_stop_sidechain_opt}" = "true" ]; then
-    witness_action true "${witness_action}" "${host_script_dir}"
-    stop_network true "${network}" "${host_script_dir}"
   fi
 }
 
@@ -751,21 +560,14 @@ clean() {
     docker rm -f $(docker ps -aq --filter ancestor=${RIPPLED_NODE_CONTAINER_NAME}) > /dev/null 2>&1
     # Remove rippled image
     docker rmi -f ${RIPPLED_NODE_CONTAINER_NAME} > /dev/null 2>&1
-    # Remove witness nodes
-    docker rm -f $(docker ps -aq --filter name=${WITNESS_SERVER_CONTAINER_NAME}) > /dev/null 2>&1
-    # Remove witness image
-    docker rmi -f ${WITNESS_SERVER_CONTAINER_NAME} > /dev/null 2>&1
     # Remove rippled_build container
     docker rm -f $(docker ps -aq --filter name=${RIPPLED_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
-    # Remove wintess_build container
-    docker rm -f $(docker ps -aq --filter name=${WITNESS_BUILD_CONTAINER_NAME}) > /dev/null 2>&1
 
     rm -f "${INSTALL_MODE_FILE}" > /dev/null 2>&1
     rm -rf $HOME/logs > /dev/null 2>&1
     rm -rf $HOME/rippled_log > /dev/null 2>&1
     rm -rf $HOME/rippled_db > /dev/null 2>&1
     rm -f ${RIPPLED_REPO_BUILT} > /dev/null 2>&1
-    rm -f ${WITNESS_REPO_BUILT} > /dev/null 2>&1
     rm -rf $HOME/.claudia > /dev/null 2>&1
   fi
 }

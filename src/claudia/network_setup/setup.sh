@@ -6,16 +6,12 @@ install="install"
 build="build"
 build_rippled_opt="false"
 install_rippled_opt="false"
-build_witness_opt="false"
 get_rippled_version_opt="false"
 run_unittests_opt="false"
 stop_network_opt="false"
 start_network_opt="false"
-witness_action_opt="false"
 validate_network_opt="false"
 launch_explorer_opt="false"
-start_sidechain_opt="false"
-stop_sidechain_opt="false"
 switch_install_mode_opt="false"
 enable_feature_opt="false"
 clean_opt="false"
@@ -29,8 +25,6 @@ ALT_HOST_SCRIPT_DIR="/tmp/network_setup"
 network="rippled"  # TODO: Change this to mainnet?
 default_network_rpc_endpoint="localhost:5001"
 default_network_ws_endpoint="localhost:6001"
-sidechain_network_rpc_endpoint="localhost:5003"
-sidechain_network_ws_endpoint="localhost:6003"
 rippled_branch="master"
 
 
@@ -42,20 +36,14 @@ usage() {
   echo "  --rippledInstall (Install rippled)"
   echo "  --rippledBranch (Branch used to generate rippled binaries. Default: ${rippled_branch})"
   echo "  --rippledBuild (Build rippled)"
-  echo "  --witnessBuild (Build witness)"
-  echo "  --witnessStart (Start witness servers)"
-  echo "  --witnessStop (Stop witness servers)"
-  echo "  --witnessStatus (Get witness servers status)"
   echo "  --rippledVersion (Get rippled version)"
   echo "  --runUnittests (Run rippled unittests)"
-  echo "  --repo <Path to rippled/witness repo>"
+  echo "  --repo <Path to rippled repo>"
   echo "  --enableFeature <feature (e.g. XChainBridge) to be enabled>"
   echo "  --disableFeature <feature (e.g. XChainBridge) to be disabled>"
   echo "  --networkStart (Start local rippled network)"
   echo "  --networkStop (Stop local rippled network)"
   echo "  --networkStatus (Get local rippled network status)"
-  echo "  --sidechainStart (Start sidechain)"
-  echo "  --sidechainStop (Stop sidechain)"
   echo "  --setInstallMode <${install}/${build}>"
   echo "  --clean (Wipe out all traces of Claudia)"
 
@@ -70,26 +58,20 @@ prepare_workspace() {
   unset DOCKER_DEFAULT_PLATFORM
 
   mkdir -p "${CLAUDIA_TMP_DIR}"
-  if [ "${build_rippled_opt}" = "true" ] || [ "${build_witness_opt}" = "true" ]; then
+  if [ "${build_rippled_opt}" = "true" ]; then
     if [ ! -d "${repo}" ]; then
       echo "Unable to find repo. Check help"
       exit 1
     fi
   fi
 
-  if [ "${build_rippled_opt}" = "true" ] || [ "${switch_install_mode_opt}" = "true" ] || [ "${install_rippled_opt}" = "true" ] || [ "${build_witness_opt}" = "true" ] || [ "${start_sidechain_opt}" = "true" ]; then
+  if [ "${build_rippled_opt}" = "true" ] || [ "${switch_install_mode_opt}" = "true" ] || [ "${install_rippled_opt}" = "true" ]; then
     echo "Log directory: ${LOG_DIR}"
     mkdir -p "${LOG_DIR}" "${WORK_DIR}"
   fi
 
 
-  if [ "${network}" = "sidechain" ]; then
-    network_rpc_endpoint="${sidechain_network_rpc_endpoint}"
-    network_ws_endpoint="${sidechain_network_ws_endpoint}"
-
-    rippled_db_dirs="$HOME/rippled_db/rippled_3 $HOME/rippled_db/rippled_4"
-    rippled_log_dirs="$HOME/rippled_log/rippled_3 $HOME/rippled_log/rippled_4"
-  else
+  if [ "${network}" = "rippled" ]; then
     network_rpc_endpoint="${default_network_rpc_endpoint}"
     network_ws_endpoint="${default_network_ws_endpoint}"
 
@@ -97,7 +79,7 @@ prepare_workspace() {
     rippled_log_dirs="$HOME/rippled_log/rippled_1 $HOME/rippled_log/rippled_2"
   fi
 
-  if [ "${start_network_opt}" = "true" ] || [ "${start_sidechain_opt}" = "true" ]; then
+  if [ "${start_network_opt}" = "true" ]; then
     echo "- Delete ${network} db & logs"
     for rippled_dir in ${rippled_db_dirs} ${rippled_log_dirs}; do
       /bin/rm -rf "${rippled_dir}"
@@ -155,16 +137,6 @@ while [ "$1" != "" ]; do
     install_mode="${install}"
     ;;
 
-  --witnessBuild)
-    build_witness_opt="true"
-    install_mode="${build}"  # Currently, witness supports only "build" installMode
-    ;;
-
-  --witnessStart | --witnessStop | --witnessStatus)
-    witness_action_opt="true"
-    witness_action="$1"
-    ;;
-
   --rippledVersion)
     get_rippled_version_opt="true"
     ;;
@@ -202,18 +174,6 @@ while [ "$1" != "" ]; do
     fi
     ;;
 
-  --sidechainStart)
-    start_sidechain_opt="true"
-    witness_action="--witnessStart"
-    network=sidechain
-    ;;
-
-  --sidechainStop)
-    stop_sidechain_opt="true"
-    witness_action="--witnessStop"
-    network=sidechain
-    ;;
-
   --setInstallMode)
     switch_install_mode_opt="true"
     shift
@@ -247,15 +207,11 @@ prepare_workspace
 stop_network "${stop_network_opt}" "${network}" "${host_script_dir}"
 docker_build_rippled "${build_rippled_opt}" "${install_mode}" "${host_script_dir}"
 docker_install_rippled "${install_rippled_opt}" "${install_mode}" "${rippled_branch}"
-docker_build_witness "${build_witness_opt}" "${install_mode}" "${host_script_dir}"
 docker_rippled_version "${get_rippled_version_opt}"
 docker_run_unittests "${run_unittests_opt}" "${filtered_unittests_to_run}"
 start_network "${start_network_opt}" "${network}" "${host_script_dir}"
 validate_network "${validate_network_opt}" "${network_rpc_endpoint}"
 launch_explorer "${launch_explorer_opt}" "${network_ws_endpoint}"
-start_sidechain "${start_sidechain_opt}" "${network}" "${host_script_dir}" "${witness_action}"
-stop_sidechain "${stop_sidechain_opt}" "${network}" "${host_script_dir}" "${witness_action}"
-witness_action "${witness_action_opt}" "${witness_action}" "${host_script_dir}"
 switch_install_mode "${switch_install_mode_opt}" "${install_mode_to_switch}"
 enable_feature "${enable_feature_opt}" "${feature_name}"
 disable_feature "${disable_feature_opt}" "${feature_name}"
